@@ -22,7 +22,10 @@ const HighestProfit = ({highestProfitData}) => {
 
     return (
         <div className="flex-item">
-            <h2>The price has been decreasing in the selected period.</h2>
+            <div className="flex-container">
+            <h2>The price has been decreasing/stagnating in the selected period.</h2>
+
+            </div>
         </div>
     )
     

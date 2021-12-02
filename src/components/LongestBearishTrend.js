@@ -15,7 +15,10 @@ const LongestBearishTrend = ({longestBearishTrendData}) => {
     }
     
     return (<div className="flex-item">
-                <h2>There are no bearish (downward) periods between the selected dates.</h2>
+        <div className="flex-container">
+        <h2>There are no bearish (downward) periods between the selected dates.</h2>
+
+        </div>
             </div>)
 }
 

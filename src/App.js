@@ -108,9 +108,9 @@ const App = () => {
   /* functions to create props for the child components */
   const calculateLongestBearishTrend = (dailyPrices) => {
     // we need at least 2 remote values to compare
-    if (dailyPrices.length < 2) {
-      return null;
-    }
+    // if (dailyPrices.length < 2) {
+    //   return null;
+    // }
 
     let longestBearishPeriodLength = 0;
     let longestBearishPeriodStartIndex = null;
