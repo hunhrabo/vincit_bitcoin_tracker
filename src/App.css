@@ -1,38 +1,148 @@
+html {
+  height: 100%;
+}
+html,
+body {
+  margin: 0;
+}
+body {
+  font-family: "Lato", sans-serif;
+  font-size: 12px;
+  color: #666666;
+  background-color: #eceff1;
+}
+
+label,
+button {
+  margin: 5px;
+}
+
+input {
+  margin-left: 5px;
+}
+
 .App {
   text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+  width: 80%;
+  margin: 20px auto;
+  padding: 20px 20px 0;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+}
+
+.app-title {
+  text-align: center;
+  font-weight: 2em;
+}
+
+.date-input {
+  padding: 5px;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 4px 5px 10px #e3e2e1;
+  background-color: #fff;
+}
+
+.btn {
+  cursor: pointer;
+  padding: 8px 10px;
+  margin-left: 5px;
+  height: 100%;
+  border: none;
+  border-radius: 10px;
+  background-color: #00e396;
+  color: #fff;
+  transition: all 0.2s linear;
+}
+
+.btn:hover {
+  background-color: #00c783;
   color: white;
+  transition: all 0.2s linear;
 }
 
-.App-link {
-  color: #61dafb;
+.flex-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 5px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.flex-item,
+.chart-container {
+  margin: 5px;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 4px 5px 10px #e3e2e1;
+}
+
+.flex-item {
+  width: 20%;
+}
+
+.metric-title {
+  text-align: center;
+  font-size: 1em;
+  margin: 5px;
+}
+
+.metric-value {
+  text-align: center;
+  font-size: 1.3em;
+  font-weight: 900;
+  margin-top: 5px;
+}
+
+.metric-extra-info {
+  text-align: center;
+  font-size: 1.1em;
+  margin-top: 5px;
+}
+
+.footer {
+  padding: 10px;
+}
+
+.footer.no-data {
+  clear: both;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+footer.loaded {
+  display: block;
+  margin: 0;
+}
+
+@media only screen and (max-width: 1200px) {
+  body {
+    font-size: 10px;
   }
-  to {
-    transform: rotate(360deg);
+
+  .App {
+    width: 95%;
+    margin: 10px auto;
+    padding: 10px 10px 0;
+  }
+
+  .metrics-container.flex-container {
+    justify-content: space-between;
+  }
+
+  .flex-item {
+    width: 30%;
+  }
+
+  .metric-value {
+    font-size: 1.2em;
+  }
+}
+
+@media only screen and (max-width: 800px) {
+  .search-form.flex-container {
+    flex-wrap: wrap;
   }
 }
