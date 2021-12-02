@@ -9,12 +9,20 @@ const Chart = ({
   bestTimestampToBuy,
   bestTimestampToSell,
 }) => {
-  console.log('prices: ', prices);
-  console.log('totalVolumes: ', totalVolumes);
-  console.log('highestTradingVolumeTimestamp: ', highestTradingVolumeTimestamp);
 
+  // need to make sure that both datalabels are added to x axis
   let mergedLabels = Array.from(new Set([...prices.map((data) => data[0]), ...totalVolumes.map((data) => data[0])]));
   mergedLabels.sort((a, b) => a - b);
+
+  // format y axis values
+  const valueFormatter = (value) => {
+    if (typeof value === 'number') {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EUR', notation: "compact",
+      compactDisplay: "short"  }).format(value)
+    }
+
+    return value;
+  }
 
   const calculateAnnotations = () => {
     const xaxis = [];
@@ -23,18 +31,18 @@ const Chart = ({
     if (longestBearishTrendMinTimestamp && longestBearishTrendMaxTimestamp) {
       xaxis.push({
         x: longestBearishTrendMinTimestamp,
-          x2: longestBearishTrendMaxTimestamp,
-          fillColor: '#f22222',
-          opacity: 0.4,
-          label: {
-            borderColor: '#f22222',
-            style: {
-              color: '#fff',
-              background: '#f22222',
-            },
-            offsetY: -10,
-            text: 'Longest bearish period',
-          }
+        x2: longestBearishTrendMaxTimestamp,
+        fillColor: '#f22222',
+        opacity: 0.4,
+        label: {
+          borderColor: '#f22222',
+          style: {
+            color: '#fff',
+            background: '#f22222',
+          },
+          offsetY: -10,
+          text: 'Longest bearish period',
+        }
       })
     }
 
@@ -105,6 +113,7 @@ const Chart = ({
       data: totalVolumes.map((data) => data[1]),
     },
   ];
+  
   const options = {
     chart: {
       height: 400,
@@ -135,9 +144,7 @@ const Chart = ({
           text: "Daily Price",
         },
         labels: {
-          //formatter: (value) => value.toLocaleString() + ' EUR'
-          formatter: (value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EUR', notation: "compact",
-          compactDisplay: "short"  }).format(value)
+          formatter: valueFormatter
         }
         
       },
@@ -147,8 +154,7 @@ const Chart = ({
           text: "Daily Total Volume",
         },
         labels: {
-          formatter: (value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EUR', notation: "compact",
-          compactDisplay: "short"  }).format(value)
+          formatter: valueFormatter
         }
       },
     ],
@@ -162,101 +168,13 @@ const Chart = ({
       breakpoint: 800,
       options: {
         stroke: {
-          width: 2
+          width: 1
         }
       }
     }
     ],
     annotations: calculateAnnotations()
-    // annotations: {
-    //   yaxis: [
-    //     {
-    //       y: totalVolumes.find(data => data[0] === highestTradingVolumeTimestamp)[1],
-    //       yAxisIndex: 1,
-    //       seriesIndex: 1,
-    //       borderColor: '#00E396',
-    //         label: {
-    //           borderColor: '#00E396',
-    //           style: {
-    //             color: '#fff',
-    //             background: '#00E396',
-    //           },
-    //           text: 'Highest Trading Volume',
-    //         }
-    //     }
-    //   ],
-    //   xaxis: [
-    //     {
-    //       x: bestTimestampToBuy,
-    //       yAxisIndex: 0,
-    //       seriesIndex: 0,
-    //       strokeDashArray: 0,
-    //         borderColor: '#775DD0',
-    //         label: {
-    //           borderColor: '#775DD0',
-    //           style: {
-    //             color: '#fff',
-    //             background: '#775DD0',
-    //           },
-    //           text: 'Best time to buy',
-    //         }
-    //     },
-    //     {
-    //       x: bestTimestampToSell,
-    //       yAxisIndex: 0,
-    //       seriesIndex: 0,
-    //       strokeDashArray: 0,
-    //         borderColor: '#775DD0',
-    //         label: {
-    //           borderColor: '#775DD0',
-    //           style: {
-    //             color: '#fff',
-    //             background: '#775DD0',
-    //           },
-    //           text: 'Best time to sell',
-    //         }
-    //     },
-    //     {
-    //       x: longestBearishTrendMinTimestamp,
-    //       x2: longestBearishTrendMaxTimestamp,
-    //       fillColor: '#f22222',
-    //       opacity: 0.4,
-    //       label: {
-    //         borderColor: '#f22222',
-    //         style: {
-    //           fontSize: '10px',
-    //           color: '#fff',
-    //           background: '#f22222',
-    //         },
-    //         offsetY: -10,
-    //         text: 'Longest bearish period',
-    //       }
-    //     }
-    //   ],
-    //   // points: [{
-    //   //   x: highestTradingVolumeTimestamp,
-    //   //   y: totalVolumes.find(data => data[0] === highestTradingVolumeTimestamp)[1],
-    //   //   yAxisIndex: 1,
-    //   //   seriesIndex: 1,
-    //   //   marker: {
-    //   //     size: 8,
-    //   //     fillColor: '#fff',
-    //   //     strokeColor: 'red',
-    //   //     radius: 2,
-    //   //     cssClass: 'apexcharts-custom-class'
-    //   //   },
-    //   //   label: {
-    //   //     borderColor: '#FF4560',
-    //   //     offsetY: 0,
-    //   //     style: {
-    //   //       color: '#fff',
-    //   //       background: '#FF4560',
-    //   //     },
     
-    //   //     text: 'Highest Trading Volume',
-    //   //   }
-    //   // }]
-    // }
   };
 
   return <ApexChart options={options} series={series} height={450} />;

@@ -1,23 +1,14 @@
+// to get "YYYY-mm-dd" format from Date object
 const convertDatetimeToDateString = (date) => {
     if (!date || !(date instanceof Date)) {
         console.log('invalid date: ', date)
         return null;
     }
 
-    // let year = date.getUTCFullYear();
-    // let month = date.getUTCMonth() + 1;
-    // let day = date.getUTCDate();
-
-    // // convert month and day to 2-digit value;
-    // month = month < 10 ? `0${month}` : month;
-    // day = day < 10 ? `0${day}` : day;
-
-    //return date.toLocaleDateString();
-    //return `${year}-${month}-${day}`
-
     return date.toISOString().slice(0, 10);
 }
 
+// to get "YYYY-mm-dd" format from timestamp
 const convertTimestampToDatestring = (timestamp) => {
     if (!timestamp || typeof timestamp !== 'number') {
         return null;
@@ -26,6 +17,7 @@ const convertTimestampToDatestring = (timestamp) => {
     return convertDatetimeToDateString(new Date(timestamp));
 }
 
+// needed to set up initial start date of date input
 const addMonthsToDate = (date, diff) => {
     if (!date || !(date instanceof Date)) {
         console.log('invalid date: ', date)
@@ -43,6 +35,7 @@ const addMonthsToDate = (date, diff) => {
     return newDate;
 }
 
+// needed to make sure current day is included
 const getEndOfDay = (date) => {
     if (!date || !(date instanceof Date)) {
         console.log('invalid date: ', date)
@@ -53,6 +46,7 @@ const getEndOfDay = (date) => {
     return new Date(nextDay.valueOf() - 1);
 }
 
+// Unix timestamp is needed by public API
 const getUnixTimestampFromDate = (date) => {
     if (!date || !(date instanceof Date)) {
         console.log('invalid date: ', date)

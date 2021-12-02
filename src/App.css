@@ -81,27 +81,36 @@ input {
   width: 20%;
 }
 
+.flex-item .flex-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+
 .metric-title {
   text-align: center;
   font-size: 1em;
-  margin: 5px;
+  margin: 10px 0px 6px;
 }
 
 .metric-value {
   text-align: center;
   font-size: 1.3em;
   font-weight: 900;
-  margin-top: 5px;
+  margin: 2px 0px 0px;
+  /* margin-top: 5px; */
 }
 
 .metric-extra-info {
   text-align: center;
   font-size: 1.1em;
-  margin-top: 5px;
+  margin: 4px 0px 6px;
+  /* margin-top: 2px; */
 }
 
 .footer {
-  padding: 10px;
+  padding: 20px 10px 10px;
 }
 
 .footer.no-data {
@@ -115,6 +124,15 @@ input {
 footer.loaded {
   display: block;
   margin: 0;
+}
+
+.footer a {
+  margin: 10px;
+  color: #775dd0;
+}
+
+.footer a:visited {
+  color: #775dd0;
 }
 
 @media only screen and (max-width: 1200px) {

@@ -6,6 +6,7 @@ import HighestTradingVolume from "./components/HighestTradingVolume";
 import HighestProfit from "./components/HighestProfit";
 import Chart from "./components/Chart";
 import './App.css';
+import Footer from "./components/Footer";
 const App = () => {
   const [prices, setPrices] = useState([]);
   const [totalVolumes, setTotalVolumes] = useState([]);
@@ -26,6 +27,8 @@ const App = () => {
     let data = await fetchMarketData(fromDate, toDate);
 
     console.log("data returned: ", data);
+
+    // update state
     if (data.prices && data.prices.length) {
       setPrices(getDataClosestToMidnight(data.prices));
     }
@@ -104,13 +107,17 @@ const App = () => {
 
   /* functions to create props for the child components */
   const calculateLongestBearishTrend = (dailyPrices) => {
+    // we need at least 2 remote values to compare
     if (dailyPrices.length < 2) {
       return null;
     }
 
     let longestBearishPeriodLength = 0;
     let longestBearishPeriodStartIndex = null;
+
+    // recursive function to compare values in the array
     let compareNext = (currentIndex, nextIndex, counter) => {
+      // reached last element or downward period ended, return length of downward period
       if (
         !dailyPrices[nextIndex] ||
         dailyPrices[nextIndex][1] >= dailyPrices[currentIndex][1]
@@ -121,6 +128,11 @@ const App = () => {
     };
 
     for (let i = 0; i < dailyPrices.length - 1; i++) {
+      // step over to the end of checked period
+      if (longestBearishPeriodStartIndex !== null && i < longestBearishPeriodStartIndex + longestBearishPeriodLength) {
+        continue;
+      }
+
       const bearishPeriodLength = compareNext(i, i + 1, 0);
 
       if (
@@ -132,11 +144,11 @@ const App = () => {
       }
     }
 
-    const minDate =
+    const minTimestamp =
       longestBearishPeriodStartIndex !== null
         ? dailyPrices[longestBearishPeriodStartIndex][0]
         : null;
-    const maxDate =
+    const maxTimestamp =
       longestBearishPeriodStartIndex !== null
         ? dailyPrices[
             longestBearishPeriodStartIndex + longestBearishPeriodLength
@@ -144,8 +156,8 @@ const App = () => {
         : null;
 
     return {
-      minDate,
-      maxDate,
+      minTimestamp,
+      maxTimestamp,
       longestBearishPeriodLength,
     };
   };
@@ -163,79 +175,77 @@ const App = () => {
       }
     });
 
-    console.log("highestTradingVolume: ", highestTradingVolume);
-    console.log("highestTradingVolumeDate: ", highestTradingVolumeDate);
-
     return {
       highestTradingVolume,
       highestTradingVolumeDate,
     };
   };
 
-  const calculateHighestPriceDiff = (dailyPrices) => {
+  const calculateHighestProfit = (dailyPrices) => {
     let bestToBuyIndex = null;
     let bestToSellIndex = null;
-    let highestPriceDiff = 0;
+    let highestProfit = 0;
+
+    // get highest future price for each datapoint recursively
+    let compareNext = (currentIndex, nextIndex, maxPrice) => {
+      // reached last element, return index of highest price
+      if (
+        !dailyPrices[nextIndex]
+      ) {
+        return currentIndex;
+      }
+
+      // set new initial datapoint
+      let newCurrentIndex = dailyPrices[nextIndex][1] >= maxPrice ? nextIndex : currentIndex;
+      return compareNext(newCurrentIndex, nextIndex + 1, dailyPrices[newCurrentIndex][1]);
+    };
 
     for (let i = 0; i < dailyPrices.length - 1; i++) {
       let currentPrice = dailyPrices[i][1];
-      let currentBestToSellIndex = null;
-      let currentPriceDiff = 0;
 
-      for (let j = i + 1; j <= dailyPrices.length - 1; j++) {
-        let nextPrice = dailyPrices[j][1];
-
-        if (nextPrice > currentPrice) {
-          if (
-            
-            nextPrice - currentPrice > currentPriceDiff
-          ) {
-            currentPriceDiff = nextPrice - currentPrice;
-            currentBestToSellIndex = j;
-          }
-        }
-        
+      // current price is higher than already checked ones, so the profit cannot be higher, so skip
+      if (bestToSellIndex !== null && i < bestToSellIndex && currentPrice > dailyPrices[bestToBuyIndex][1]) {
+        continue;
       }
 
-      if (currentPriceDiff >= highestPriceDiff) {
-        highestPriceDiff = currentPriceDiff;
-        bestToBuyIndex = i;
-        bestToSellIndex = currentBestToSellIndex;
+      let currentBestToSellIndex = compareNext(i, i + 1, currentPrice);
+
+      if (i !== currentBestToSellIndex) {
+        const currentProfit = dailyPrices[currentBestToSellIndex][1] - currentPrice;
+
+        // in case of identical periods, get the latest one
+        if (currentProfit > 0 && currentProfit >= highestProfit) {
+          highestProfit = currentProfit;
+          bestToBuyIndex = i;
+          bestToSellIndex = currentBestToSellIndex;
+        }
       }
     }
 
-    const bestDayToBuy = bestToBuyIndex !== null ? dailyPrices[bestToBuyIndex][0] : null;
+    const bestTimestampToBuy = bestToBuyIndex !== null ? dailyPrices[bestToBuyIndex][0] : null;
     const bestBuyPrice = bestToBuyIndex !== null ? dailyPrices[bestToBuyIndex][1] : null;
-    const bestDayToSell = bestToSellIndex !== null ? dailyPrices[bestToSellIndex][0] : null;
+    const bestTimestampToSell = bestToSellIndex !== null ? dailyPrices[bestToSellIndex][0] : null;
     const bestSellPrice = bestToSellIndex !== null ? dailyPrices[bestToSellIndex][1] : null;
-    const profit = highestPriceDiff;
-
-    console.log("bestDayToBuy: ", bestDayToBuy);
-    console.log("bestBuyPrice: ", bestBuyPrice);
-    console.log("bestDayToSell: ", bestDayToSell);
-    console.log("bestSellPrice: ", bestSellPrice);
-    console.log("profit: ", profit);
+    const profit = highestProfit;
 
     return {
-      bestDayToBuy,
+      bestTimestampToBuy,
       bestBuyPrice,
-      bestDayToSell,
+      bestTimestampToSell,
       bestSellPrice,
       profit,
     };
   };
 
-  
-
   if (prices.length > 0 && totalVolumes.length > 0) {
     /* calculate props */
     const longestBearishTrendData = calculateLongestBearishTrend(prices);
     const highestTradingVolumeData = calculateHighestTradingVolume(totalVolumes);
-    const highestPriceDiffData = calculateHighestPriceDiff(prices);
+    const highestProfitData = calculateHighestProfit(prices);
 
     return (
       <div className="App">
-      <h1 className="app-title">Bitcoin tracker</h1>
+      <h1 className="app-title">Bitcoin Tracker</h1>
         <SearchForm getMarketData={getMarketData} />
         <div className="metrics-container flex-container">
         <LongestBearishTrend
@@ -245,32 +255,32 @@ const App = () => {
         <HighestTradingVolume
             highestTradingVolumeData={highestTradingVolumeData}
           />
-        <HighestProfit highestPriceDiffData={highestPriceDiffData} />
+        <HighestProfit highestProfitData={highestProfitData} />
         </div>
         <div className="chart-container">
         <Chart
             prices={prices}
             totalVolumes={totalVolumes}
-            longestBearishTrendMinTimestamp={longestBearishTrendData.minDate}
-            longestBearishTrendMaxTimestamp={longestBearishTrendData.maxDate}
+            longestBearishTrendMinTimestamp={longestBearishTrendData.minTimestamp}
+            longestBearishTrendMaxTimestamp={longestBearishTrendData.maxTimestamp}
             highestTradingVolumeTimestamp={
               highestTradingVolumeData.highestTradingVolumeDate
             }
-            bestTimestampToBuy={highestPriceDiffData.bestDayToBuy}
-            bestTimestampToSell={highestPriceDiffData.bestDayToSell}
+            bestTimestampToBuy={highestProfitData.bestTimestampToBuy}
+            bestTimestampToSell={highestProfitData.bestTimestampToSell}
           />
         </div>
         
-        <footer className="footer loaded">Copyright &copy; Tamas Hrabovszki</footer>
+        <Footer noData={false} />
       </div>
     );
   }
 
   return (
     <div className="App">
-      <h1 className="app-title">Bitcoin tracker</h1>
+      <h1 className="app-title">Bitcoin Tracker</h1>
       <SearchForm getMarketData={getMarketData} />
-      <footer className="footer no-data">Copyright &copy; Tamas Hrabovszki</footer>
+      <Footer noData={true} />
     </div>
   );
   
